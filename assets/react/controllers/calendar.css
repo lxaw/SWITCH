@@ -1,0 +1,9 @@
+.highlight {
+    color: rgb(49, 255, 49);
+    font-weight: bolder;
+}
+
+/* react automatically sets weekends to red */
+.react-calendar__month-view__days__day--weekend{
+    color:black
+}
