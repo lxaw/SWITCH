@@ -11,17 +11,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Form\FoodFormType;
 
 // food entities and repositorie containers
-use App\Entity\MenustatFood;
-use App\Repository\MenustatRepository;
-use App\Entity\UsdaBrandedFood;
-use App\Repository\UsdaBrandedFoodRepository;
-use App\Entity\UsdaNonBrandedFood;
-use App\Form\MenustatFoodFormType;
-use App\Form\UsdaBrandedFoodFormType;
-use App\Form\UsdaNonBrandedFoodFormType;
-use App\Repository\UsdaNonBrandedFoodRepository;
+use App\Entity\Food;
+use App\Repository\FoodRepository;
 
 use Symfony\Component\HttpFoundation\Request;
 
@@ -61,20 +55,12 @@ class FoodController extends AbstractController
     public function byDate($date): Response
     {
         // get each repo
-        $menustatRepo = $this->em->getRepository(MenustatFood::class);
-        $usdaBrandedRepo= $this->em->getRepository(UsdaBrandedFood::class);
-        $usdaNonBrandedRepo= $this->em->getRepository(UsdaNonBrandedFood::class);
+        $foodRepo= $this->em->getRepository(Food::class);
 
         $userFoods = array();
 
         // push the foods
-        $userFoods = array_merge($userFoods,$menustatRepo->findBy([
-            'User' =>  $this->getUser()
-        ]));
-        $userFoods = array_merge($userFoods,$usdaBrandedRepo->findBy([
-            'User' =>  $this->getUser()
-        ]));
-        $userFoods = array_merge($userFoods,$usdaNonBrandedRepo->findBy([
+        $userFoods = array_merge($userFoods,$foodRepo->findBy([
             'User' =>  $this->getUser()
         ]));
 
@@ -102,18 +88,14 @@ class FoodController extends AbstractController
     public function index(): Response
     {
         $conn = $this->em->getConnection();
-        $sqlMenustatDates = "
+        $sqlFoodDates = "
         select distinct substring_index(date,' ',1) as subDate
         from (
-            select date from menustat_food
-            union
-            select date from usda_branded_food
-            union
-            select date from usda_non_branded_food
+            select date from food
         ) tableName
         order by subDate DESC
         ";
-        $stmt = $conn->prepare($sqlMenustatDates);
+        $stmt = $conn->prepare($sqlFoodDates);
         $dates = $stmt ->execute()->fetchAll(\PDO::FETCH_COLUMN);
 
         return $this->render('food/index.html.twig', [
@@ -121,7 +103,7 @@ class FoodController extends AbstractController
         ]);
     }
 
-    #[Route('/food/show/{strDataType}/{id}', methods: ["GET"],name:'FoodController__getFoodById')]    
+    #[Route('/food/show/{id}', methods: ["GET"],name:'FoodController__getFoodById')]    
     /**
      * Show a specific food.
      * Given an id and datatype, show the food.
@@ -130,35 +112,17 @@ class FoodController extends AbstractController
      * @param  mixed $id
      * @return Response
      */
-    public function show($strDataType,$id): Response
+    public function show($id): Response
     {
         $food = NULL;
-        switch($strDataType){
-            case "MenustatFood":
-                $menustatRepo = $this->em->getRepository(MenustatFood::class);
-                $food= $menustatRepo->find($id);
+        $menustatRepo = $this->em->getRepository(Food::class);
+        $food= $menustatRepo->find($id);
 
-                return $this->render('food/menustat/show.html.twig',[
-                    'food' => $food
-                ]);
-            case "UsdaBrandedFood":
-                $usdaBrandedRepo = $this->em->getRepository(UsdaBrandedFood::class);
-                $food= $usdaBrandedRepo->find($id);
-                
-                return $this->render('food/usda_branded/show.html.twig',[
-                    'food' => $food
-                ]);
-            case "UsdaNonBrandedFood":
-                $usdaNonBrandedRepo= $this->em->getRepository(UsdaNonBrandedFood::class);
-                $food= $usdaNonBrandedRepo->find($id);
-
-                return $this->render('food/usda_non_branded/show.html.twig',[
-                    'food' => $food
-                ]);
-        }
-        return $this->redirectToRoute('FoodController__index');
+        return $this->render('food/menustat/show.html.twig',[
+            'food' => $food
+        ]);
     }
-    #[Route('/food/update/{strDataType}/{id}', methods: ["GET","POST"],name:'FoodController__updateFoodById')]    
+    #[Route('/food/update/{id}', methods: ["GET","POST"],name:'FoodController__updateFoodById')]    
     /**
      * Show a specific food.
      * Given an id and datatype, show the food.
@@ -167,7 +131,7 @@ class FoodController extends AbstractController
      * @param  mixed $id
      * @return Response
      */
-    public function update($strDataType,$id,Request $request): Response
+    public function update($id,Request $request): Response
     {
         $form = NULL;
         $foodRepo = NULL;
@@ -175,54 +139,47 @@ class FoodController extends AbstractController
         // path to render
         $strRenderPath = "/food/update.html.twig";
 
-        switch($strDataType){
-            case "MenustatFood":
-                // get the food
-                $foodRepo = $this->em->getRepository(MenustatFood::class);
-                $food = $foodRepo->find($id);
-                $form = $this->createForm(MenustatFoodFormType::class,$food);
-                $form->handleRequest($request);
-                if($form->isSubmitted() && $form->isValid()){
-                    // To do!
-                    // make so you can update all fields
-                    $food->setDescription($form->get('Description')->getData());
-                    $this->em->flush();
-                    return $this->redirectToRoute('FoodController__getFoodById',array(
-                        'strDataType' => $strDataType,
-                        'id' => $id
-                    ));
-                }
-                break;
-            case "UsdaBrandedFood":
-                $foodRepo= $this->em->getRepository(UsdaBrandedFood::class);
-                $food = $foodRepo->find($id);
-                $form = $this->createForm(UsdaBrandedFoodFormType::class,$food);
-                $form->handleRequest($request);
-                if($form->isSubmitted() && $form->isValid()){
-                    $food->setDescription($form);
-                    $this->em->flush();
-                    return $this->redirectToRoute('FoodController__getFoodById',array(
-                        'strDataType' => $strDataType,
-                        'id'=>$id
-                    ));
-                }
-                break;
-            case "UsdaNonBrandedFood":
-                $foodRepo= $this->em->getRepository(UsdaNonBrandedFood::class);
-                $food = $foodRepo->find($id);
-                $form = $this->createForm(UsdaNonBrandedFoodFormType::class,$food);
-                $form->handleRequest($request);
-                if($form->isSubmitted() && $form->isValid()){
-                    $food->setDescription($form);
-                    $this->em->flush();
-                    return $this->redirectToRoute('FoodController__getFoodById',array(
-                        'strDataType' => $strDataType,
-                        'id'=>$id
-                    ));
-                }
-                break;
-        }
+        $foodRepo = $this->em->getRepository(Food::class);
+        $food = $foodRepo->find($id);
+        $form = $this->createForm(FoodFormType::class,$food);
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+            // update all attributes
+            //
+            $food->setFoodName($form->get('FoodName')->getData());
+            $food->setRestaurant($form->get('Restaurant')->getData());
+            $food->setFoodCategory($form->get('FoodCategory')->getData());
+            $food->setServingSize($form->get('ServingSize')->getData());
+            $food->setServingSizeUnit($form->get('ServingSizeUnit')->getData());
+            $food->setEnergyAmount($form->get('EnergyAmount')->getData());
+            $food->setEnergyUnit($form->get('EnergyUnit')->getData());
+            $food->setFatAmount($form->get('FatAmount')->getData());
+            $food->setFatUnit($form->get('FatUnit')->getData());
+            $food->setCarbAmount($form->get('CarbAmount')->getData());
+            $food->setCarbUnit($form->get('CarbUnit')->getData());
+            $food->setProteinAmount($form->get('ProteinAmount')->getData());
+            $food->setProteinUnit($form->get('ProteinUnit')->getData());
+            $food->setQuantity($form->get('Quantity')->getData());
+            $food->setPotassiumAmount($form->get('PotassiumAmount')->getData());
+            $food->setPotassiumUnit($form->get('PotassiumUnit')->getData());
+            $food->setFiberAmount($form->get('FiberAmount')->getData());
+            $food->setFiberUnit($form->get('FiberUnit')->getData());
+            $food->setDate($form->get('Date')->getData());
 
+            // now set totals
+            $food->setTotalEnergyAmount($form->get('EnergyAmount')->getData() * $form->get('Quantity')->getData());
+            $food->setTotalFiberAmount($form->get('FiberAmount')->getData() * $form->get('Quantity')->getData());
+            $food->setTotalPotassiumAmount($form->get('PotassiumAmount')->getData() * $form->get('Quantity')->getData());
+            $food->setTotalFatAmount($form->get('FatAmount')->getData() * $form->get('Quantity')->getData());
+            $food->setTotalCarbAmount($form->get('CarbAmount')->getData() * $form->get('Quantity')->getData());
+            $food->setTotalProteinAmount($form->get('ProteinAmount')->getData() * $form->get('Quantity')->getData());
+
+
+            $this->em->flush();
+            return $this->redirectToRoute('FoodController__getFoodById',array(
+                'id' => $id
+            ));
+        }
 
         return $this->render($strRenderPath,[
             'food' => $food,

@@ -10,15 +10,15 @@
     <div class = 'card m-3 p-3' style="width:50rem;">
         <div class = "d-flex justify-content-between">
             <div>
-                <img src = "{{food.getImgPath}}" alt = "{{food.Description}} img" class = 'rounded'>
+                <img src = "{{food.getImagePath}}" alt = "{{food.getFoodName}} img" class = 'rounded'>
             </div>
             <div>
                 <h1 class = 'text-center'>
-                    {{food.Description}}
+                    {{food.getFoodName}}
                 </h1>
             </div>
             <div>
-                Date: {{food.Date | date('m-d-Y')}}
+                Date: {{food.getDate| date('m-d-Y')}}
             </div>
         </div>
         <hr>
@@ -46,7 +46,7 @@
             </div>
         </div>
         <div class = 'd-flex justify-content-between'>
-            <a href="{{path('FoodController__updateFoodById', {strDataType: get_class(food), id: food.id })}}">
+            <a href="{{ path('FoodController__updateFoodById', {id: food.id} ) }}">
                 <button class = 'btn btn-sm btn-outline-primary'>
                 Edit
                 </button>

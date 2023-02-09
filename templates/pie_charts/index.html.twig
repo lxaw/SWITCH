@@ -8,7 +8,7 @@
 
     <div class = 'container shadow p-3'>
         <div class = 'row'>
-            <div class = 'col-8'>
+            <div>
                 <small>
                     Food Name
                 </small>
@@ -23,30 +23,6 @@
                     placeholder = 'type at least 3 characters'
                     class = 'form-control' > 
                 </div>
-            </div>
-            <div class = 'col-4'>
-                <small>
-                    Database Type
-                </small>
-                <select class = "form-select" id = "select__db-options">
-                    <option selected value = "menustat">
-                        <h2>
-                            Menustat
-                        </h2>
-                    </option>
-                    <option value = "usda_branded">
-                        <h2>
-                            USDA Branded
-                        </h2>
-                    </option>
-                    <option value = "usda_non-branded">
-                        <h2>
-                            USDA Non-branded
-                        </h2>
-                    </option>
-                </select>
-            </div>
-            <div class = 'col-6'>
             </div>
         </div>
         <br>
@@ -102,13 +78,6 @@
 
 {# for hidden menustat entry #}
 {% include './pie_charts/menustat/saved_entry.html.twig' %}
-
-{# for hidden usda_branded entry #}
-{% include './pie_charts/usda_branded/saved_entry.html.twig' %}
-
-{# for hidden usda_non_branded entry #}
-{% include './pie_charts/usda_non_branded/saved_entry.html.twig' %}
-
 
 {# To hold the modal #}
 <div id = "div__modal-holder">
@@ -424,7 +393,6 @@
             type:'GET',
             dataType:'text',
             data:{
-                strDbType:strDbType,
                 strId:strId,
             },
             success:function(data){
@@ -538,7 +506,6 @@
             dataType:'text',
             data:{
                 strQuery:strFoodName,
-                strDBType:strDBType,
                 intOffset:intOffset
             },
             success:function(data){
@@ -625,17 +592,13 @@
         foodDict = {};
         $(".div__saved-entry").each((index,element)=>{
             strId = $(element).attr('dbId');
-            strDataType = $(element).attr('data-type');
             strQty = $(element).find('.input__saved-entry-qty').val();
-
-            console.log(strDataType);
 
             $.ajax({
                 url:'/ajax/submitFoods',
                 type:'POST',
                 dataType:'JSON',
                 data:{
-                    strDataType: strDataType,
                     strId: strId,
                     strQty: strQty
                 },
