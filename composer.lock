@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "efdf8a2778acb1cfb63915ea5821e320",
+    "content-hash": "cc09904b566d9cc24fe8ca8efe4b5765",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1396,16 +1396,16 @@
         },
         {
             "name": "easycorp/easyadmin-bundle",
-            "version": "v4.5.0",
+            "version": "v4.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EasyCorp/EasyAdminBundle.git",
-                "reference": "b1ea3b93c82a6c410f91100da658967d2fcad369"
+                "reference": "90b3ccd9565b986d9d39ed8ca7f390063a760321"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/b1ea3b93c82a6c410f91100da658967d2fcad369",
-                "reference": "b1ea3b93c82a6c410f91100da658967d2fcad369",
+                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/90b3ccd9565b986d9d39ed8ca7f390063a760321",
+                "reference": "90b3ccd9565b986d9d39ed8ca7f390063a760321",
                 "shasum": ""
             },
             "require": {
@@ -1477,7 +1477,7 @@
             ],
             "support": {
                 "issues": "https://github.com/EasyCorp/EasyAdminBundle/issues",
-                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v4.5.0"
+                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v4.6.0"
             },
             "funding": [
                 {
@@ -1485,7 +1485,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-12-21T19:04:08+00:00"
+            "time": "2023-02-20T19:01:40+00:00"
         },
         {
             "name": "egulias/email-validator",
@@ -4331,16 +4331,16 @@
         },
         {
             "name": "symfony/intl",
-            "version": "v6.1.7",
+            "version": "v6.1.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/intl.git",
-                "reference": "8025e5b651512b21d3e768321d45a2e5e32e8c66"
+                "reference": "776bfc0379adcb11ece25aa2aa7ddf87a22533c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/intl/zipball/8025e5b651512b21d3e768321d45a2e5e32e8c66",
-                "reference": "8025e5b651512b21d3e768321d45a2e5e32e8c66",
+                "url": "https://api.github.com/repos/symfony/intl/zipball/776bfc0379adcb11ece25aa2aa7ddf87a22533c1",
+                "reference": "776bfc0379adcb11ece25aa2aa7ddf87a22533c1",
                 "shasum": ""
             },
             "require": {
@@ -4391,7 +4391,7 @@
                 "localization"
             ],
             "support": {
-                "source": "https://github.com/symfony/intl/tree/v6.1.7"
+                "source": "https://github.com/symfony/intl/tree/v6.1.11"
             },
             "funding": [
                 {
@@ -4407,7 +4407,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-10-23T10:33:34+00:00"
+            "time": "2023-01-01T08:36:55+00:00"
         },
         {
             "name": "symfony/mailer",
@@ -7721,39 +7721,6 @@
                 }
             ],
             "time": "2022-10-18T15:21:06+00:00"
-        },
-        {
-            "name": "symfony/webpack-encore-pack",
-            "version": "v1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/webpack-encore-pack.git",
-                "reference": "f9f4e91659e5f55de370d6aebe77e64bce35e4d3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/webpack-encore-pack/zipball/f9f4e91659e5f55de370d6aebe77e64bce35e4d3",
-                "reference": "f9f4e91659e5f55de370d6aebe77e64bce35e4d3",
-                "shasum": ""
-            },
-            "type": "symfony-pack",
-            "extra": {
-                "thanks": {
-                    "name": "symfony/webpack-encore",
-                    "url": "https://github.com/symfony/webpack-encore"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "A pack for Symfony Encore",
-            "support": {
-                "issues": "https://github.com/symfony/webpack-encore-pack/issues",
-                "source": "https://github.com/symfony/webpack-encore-pack/tree/master"
-            },
-            "abandoned": "symfony/webpack-encore-bundle",
-            "time": "2017-12-21T02:20:09+00:00"
         },
         {
             "name": "symfony/yaml",
