@@ -2,18 +2,34 @@
 
 namespace App\Controller\Admin;
 
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+namespace App\Controller\Admin;
+
+use App\Entity\Product;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Symfony\Component\HttpFoundation\Response;
+use App\Entity\User;
 
 class UserCrudController extends AbstractCrudController
 {
+    public const ACTION_DUPLICATE = "duplicate";
+
     public static function getEntityFqcn(): string
     {
         return User::class;
@@ -31,27 +47,49 @@ class UserCrudController extends AbstractCrudController
     }
     public function configureActions(Actions $actions): Actions
     {
-        $saveCsv = Action::new('saveCsv','Save as Csv', 'fa fa-save-as-csv')
+        $saveCsv = Action::new('saveCsv','Save as Csv')
             ->displayAsButton()
-            ->linkToCrudAction('saveUsersToCsv');
+            ->linkToCrudAction('saveUsersToCsv')
+            ->createAsGlobalAction();
+        $duplicate = Action::new(self::ACTION_DUPLICATE)
+            ->linkToCrudAction('duplicateProduct')
+            ->setCssClass('btn btn-info');
+
 
         return $actions
-            ->add(Crud::PAGE_DETAIL,$saveCsv);
+            ->add(Crud::PAGE_EDIT,$duplicate)
+            ->add(Crud::PAGE_INDEX,$saveCsv);
+    }
+        public function duplicateProduct(
+        AdminContext $context,
+        AdminUrlGenerator $adminUrlGenerator,
+        EntityManagerInterface $em
+    ): Response {
+        /** @var User $product */
+        $product = $context->getEntity()->getInstance();
+
+        $duplicatedProduct = clone $product;
+
+        parent::persistEntity($em, $duplicatedProduct);
+
+        $url = $adminUrlGenerator->setController(self::class)
+            ->setAction(Action::DETAIL)
+            ->setEntityId($duplicatedProduct->getId())
+            ->generateUrl();
+
+        return $this->redirect($url);
     }
     // https://stackoverflow.com/questions/27888374/create-csv-and-force-download-of-file
-    public function saveUsersToCsv(AdminContext $context){
-        // $instance = $context->getEntity()->getInstance();
-
-        $fileName = "test";
-        $filePath = $_SERVER["DOCUMENT_ROOT"] . $fileName . '.csv';
-        $output = fopen($filePath,'w+');
-        fputcsv($output,array("Number","Description","test"));
-        fputcsv($output,array("100","TestDescription","10"));
-
-        // set the headers
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename ="'.$fileName.".csv'");
-        header('Content-Length: ' .filesize($filePath));
-        echo readfile($filePath);
+    public function saveUsersToCsv(
+        AdminContext $context,
+        AdminUrlGenerator $adminUrlGenerator,
+        EntityManager $em
+    ): Response{
+        $instance = $context->getEntity()->getInstance();
+        
+        $url = $adminUrlGenerator->setController(self::class)
+            ->setAction(Action::DETAIL)
+            ->generateUrl();
+        return $this->redirect($url);;;;
     }
 }
