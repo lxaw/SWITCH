@@ -24,11 +24,24 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
 use App\Entity\User;
+
+use App\CustomResponses\CsvResponse;
+
 
 class UserCrudController extends AbstractCrudController
 {
-    public const ACTION_DUPLICATE = "duplicate";
+    public const ACTION_SAVE_CSV = "SAVE_CSV";
+
+    // entity manager
+    private $em;
+
+    public function __construct(EntityManagerInterface $em){
+        $this->em = $em;
+    }
+    
 
     public static function getEntityFqcn(): string
     {
@@ -47,49 +60,41 @@ class UserCrudController extends AbstractCrudController
     }
     public function configureActions(Actions $actions): Actions
     {
-        $saveCsv = Action::new('saveCsv','Save as Csv')
-            ->displayAsButton()
-            ->linkToCrudAction('saveUsersToCsv')
-            ->createAsGlobalAction();
-        $duplicate = Action::new(self::ACTION_DUPLICATE)
+        $duplicate = Action::new(self::ACTION_SAVE_CSV)
             ->linkToCrudAction('duplicateProduct')
-            ->setCssClass('btn btn-info');
-
+            ->setCssClass('btn btn-info')
+            ->createAsGlobalAction();
 
         return $actions
-            ->add(Crud::PAGE_EDIT,$duplicate)
-            ->add(Crud::PAGE_INDEX,$saveCsv);
+            ->add(Crud::PAGE_INDEX,$duplicate);
     }
-        public function duplicateProduct(
+
+    public function duplicateProduct(
         AdminContext $context,
         AdminUrlGenerator $adminUrlGenerator,
         EntityManagerInterface $em
     ): Response {
-        /** @var User $product */
-        $product = $context->getEntity()->getInstance();
 
-        $duplicatedProduct = clone $product;
+        $userRepo = $this->em->getRepository(User::class);
+        $users= $userRepo->findAll(); // Doctrine query
+        $rows = array();
+        $columns = array(
+            'id',
+            'email',
+        );
+        $rows[] = implode(',',$columns);
+        foreach($users as $user){
+            $data = array(
+                $user->getId(),
+                $user->getEmail(),
+            );
+            $rows[] = implode(',',$data);
+        }
+        $content = implode("\n",$rows);
+        $response = new Response($content);
+        $response->headers->set("Content-Type",'text/csv');
+        $response->headers->set("Content-Disposition",'attachment; filename="users.csv"');
 
-        parent::persistEntity($em, $duplicatedProduct);
-
-        $url = $adminUrlGenerator->setController(self::class)
-            ->setAction(Action::DETAIL)
-            ->setEntityId($duplicatedProduct->getId())
-            ->generateUrl();
-
-        return $this->redirect($url);
-    }
-    // https://stackoverflow.com/questions/27888374/create-csv-and-force-download-of-file
-    public function saveUsersToCsv(
-        AdminContext $context,
-        AdminUrlGenerator $adminUrlGenerator,
-        EntityManager $em
-    ): Response{
-        $instance = $context->getEntity()->getInstance();
-        
-        $url = $adminUrlGenerator->setController(self::class)
-            ->setAction(Action::DETAIL)
-            ->generateUrl();
-        return $this->redirect($url);;;;
+        return $response;
     }
 }
