@@ -28,9 +28,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 use App\Entity\User;
 
-use App\CustomResponses\CsvResponse;
-
-
 class UserCrudController extends AbstractCrudController
 {
     public const ACTION_SAVE_CSV = "SAVE_CSV";
@@ -60,16 +57,16 @@ class UserCrudController extends AbstractCrudController
     }
     public function configureActions(Actions $actions): Actions
     {
-        $duplicate = Action::new(self::ACTION_SAVE_CSV)
-            ->linkToCrudAction('duplicateProduct')
+        $saveCsv= Action::new(self::ACTION_SAVE_CSV)
+            ->linkToCrudAction('saveUsersToCsv')
             ->setCssClass('btn btn-info')
             ->createAsGlobalAction();
 
         return $actions
-            ->add(Crud::PAGE_INDEX,$duplicate);
+            ->add(Crud::PAGE_INDEX,$saveCsv);
     }
 
-    public function duplicateProduct(
+    public function saveUsersToCsv(
         AdminContext $context,
         AdminUrlGenerator $adminUrlGenerator,
         EntityManagerInterface $em
