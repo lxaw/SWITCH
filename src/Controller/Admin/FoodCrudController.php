@@ -1,6 +1,11 @@
 <?php
 
 /*
+The Food entity class's CRUD controller
+Admin page
+*/
+
+/*
 https://symfony.com/doc/current/the-fast-track/en/9-backend.html
 */
 namespace App\Controller\Admin;
@@ -35,12 +40,15 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class FoodCrudController extends AbstractCrudController
 {
+    // action name for saving to csv
     public const ACTION_SAVE_CSV = "SAVE_CSV";
 
     // entity manager
     private $em;
 
+    // ctor
     public function __construct(EntityManagerInterface $em){
+        // setting the entity manager up so can use later to grab food
         $this->em = $em;
     }
 
@@ -55,6 +63,9 @@ class FoodCrudController extends AbstractCrudController
             ->setSearchFields(['User']);
     }
 
+    // adding a new action
+    // in this case, ability to save to csv
+    // see here: https://symfony.com/bundles/EasyAdminBundle/current/actions.html 
     public function configureActions(Actions $actions): Actions
     {
         $saveCsv = Action::new(self::ACTION_SAVE_CSV) 
@@ -66,14 +77,15 @@ class FoodCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX,$saveCsv);
     }
 
+    // function to save food to csv
     public function saveFoodToCsv(
         AdminContext $context,
         AdminUrlGenerator $adminUrlGenerator,
         EntityManagerInterface $em
     ): Response {
-
-        $userRepo = $this->em->getRepository(Food::class);
-        $foods= $userRepo->findAll(); // Doctrine query
+        // save all food items
+        $foodRepo = $this->em->getRepository(Food::class);
+        $foods= $foodRepo->findAll(); // Doctrine query
         $rows = array();
         $columns = array(
             'id',

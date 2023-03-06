@@ -1,5 +1,9 @@
 <?php
 
+/*
+Default SecurityController as created by Symfony.
+*/
+
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
