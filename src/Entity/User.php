@@ -1,5 +1,10 @@
 <?php
 
+/*
+User entity.
+Please change according to your needs.
+*/
+
 namespace App\Entity;
 
 use App\Repository\UserRepository;

@@ -19,13 +19,6 @@ use App\Repository\FoodRepository;
 
 use Symfony\Component\HttpFoundation\Request;
 
-/*
-TO DO:
-Make sure that private routes are private for all users, ie
-for displaying a food by id, make sure only that user who
-created the food can do this.
-*/
-
 class FoodController extends AbstractController
 {
     // The entity manager
@@ -36,8 +29,11 @@ class FoodController extends AbstractController
         $this->em = $em;
     }
 
-    // Sort by dates.
-    //
+    /*
+    Sort objects by date.
+    Inputs: any object with a get date function that returns a comparable data type
+    Outputs: 0 if date is same, 1 if objA date is higher, -1 if objA date is lower
+    */
     function date_sort($objA,$objB){
         if($objA->getDate() == $objB->getDate()) return 0;
         return ($objA->getDate() < $objB->getDate()) ? -1:1;
@@ -59,7 +55,7 @@ class FoodController extends AbstractController
 
         $userFoods = array();
 
-        // push the foods
+        // push the foods that have been created by the user
         $userFoods = array_merge($userFoods,$foodRepo->findBy([
             'User' =>  $this->getUser()
         ]));
@@ -87,7 +83,9 @@ class FoodController extends AbstractController
      */
     public function index(): Response
     {
+        // make sql connection to food database (the one internal to symfony, the entity table)
         $conn = $this->em->getConnection();
+
         $sqlFoodDates = "
         select distinct substring_index(date,' ',1) as subDate
         from (
@@ -186,8 +184,12 @@ class FoodController extends AbstractController
             'form'=> $form->createView()
         ]);
     }
+    /*
+    This function was to check if a user owns the food identified in any page that uses a specific 
+    entity id in the url. For instance, users should not be able to access /food/update/1 if they did not enter a food 
+    with id of 1.
+    */
     private function checkUserOwnsFood(){
-        // todo
         
     }
 }

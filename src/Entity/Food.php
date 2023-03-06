@@ -1,6 +1,9 @@
 <?php
-/*
 
+/*
+Food entity.
+Please change fields according to needs. These fields were generated 
+with reference to the Menustat food database.
 */
 
 namespace App\Entity;

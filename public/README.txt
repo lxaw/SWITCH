@@ -1,0 +1,1 @@
+The code regarding the pie charts is in the `js` folder.

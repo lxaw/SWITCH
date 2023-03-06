@@ -1,5 +1,10 @@
 <?php
 
+/*
+Form for the Food entity.
+Please change as necessary.
+*/
+
 namespace App\Form;
 
 use App\Entity\Food;

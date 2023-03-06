@@ -1,5 +1,10 @@
 <?php
 
+/*
+Form for registration.
+Please change as necessary.
+*/
+
 namespace App\Form;
 
 use App\Entity\User;

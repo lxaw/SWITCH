@@ -1,5 +1,9 @@
 <?php
 
+/*
+Controller for handling user registration.
+*/
+
 namespace App\Controller;
 
 use App\Entity\User;
